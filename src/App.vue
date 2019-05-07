@@ -6,18 +6,18 @@
     <Trailer />
 
     <!-- <MuteButton /> -->
-    <LandingLayout />
+    <Landing />
   </div>
 </template>
 
 <script>
-import LandingLayout from "@/layouts/Landing.vue";
+import Landing from "@/layouts/Landing.vue";
 import Trailer from "@/components/partials/Trailer.vue";
 
 export default {
   name: "app",
   components: {
-    LandingLayout,
+    Landing,
     Trailer
   }
 };
