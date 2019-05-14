@@ -39,7 +39,12 @@ export default {
 
     // graphics
     const graphics = new PIXI.Graphics();
-    graphics.beginFill(0xff3300);
+
+    // images
+    let image = PIXI.Sprite.from(require("@/assets/image.jpg"));
+    image.mask = graphics;
+
+    graphics.beginFill(0xff0000, 0);
     graphics.moveTo(0, 0);
     graphics.lineTo(window.innerWidth, 0);
     graphics.lineTo(window.innerWidth, window.innerHeight / 2 + this.ratio);

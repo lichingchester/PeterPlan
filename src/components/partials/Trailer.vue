@@ -19,6 +19,6 @@ export default {
   font-size: 150px;
   font-weight: 900;
   z-index: $z-trailer;
-  color: #fff;
+  color: black;
 }
 </style>
