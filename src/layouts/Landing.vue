@@ -13,8 +13,8 @@ export default {
       context: null,
 
       position: {
-        y1: window.innerHeight / 2 + 70,
-        y2: window.innerHeight / 2 - 70
+        y1: window.innerHeight / 2 + 60,
+        y2: window.innerHeight / 2 - 60
       },
       requestId: undefined,
 
@@ -74,17 +74,32 @@ export default {
 
       this.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
       this.context.save();
+
+      // draw container
       this.context.beginPath();
       this.context.moveTo(0, 0);
       this.context.lineTo(window.innerWidth, 0);
       this.context.lineTo(window.innerWidth, this.position.y1);
       this.context.lineTo(0, this.position.y2);
+
       this.context.clip();
 
+      // draw image
       this.drawImage(this.image);
+
+      // draw text
+      this.context.font = "bold 200px Arial";
+      this.context.fillStyle = "red";
+      this.context.textAlign = "center";
+      this.context.textBaseline = "middle";
+      this.context.fillText(
+        "EXPLORE",
+        window.innerWidth / 2,
+        window.innerHeight / 2
+      );
+
       this.context.restore();
     },
-    drawBottomLayer() {},
 
     drawImage(image) {
       console.log("draw image");
