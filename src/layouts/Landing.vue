@@ -1,8 +1,10 @@
 <template>
-  <canvas class="landing" ref="landing"></canvas>
+  <canvas class="landing" ref="landing" @click="onClick"></canvas>
 </template>
 
 <script>
+import { TweenLite, Power3 } from "gsap";
+
 export default {
   name: "Landing",
   data() {
@@ -10,46 +12,91 @@ export default {
       canvas: null,
       context: null,
 
-      ratio: 60
+      position: {
+        y1: window.innerHeight / 2 + 70,
+        y2: window.innerHeight / 2 - 70
+      },
+      requestId: undefined,
+
+      // assets
+      image: null,
+      loaded: false
     };
   },
+  watch: {
+    loaded(state) {
+      if (state) {
+        this.drawTopLayer();
+      }
+    }
+  },
   mounted() {
-    let self = this;
+    // loading assets
+    this.image = new Image();
+    this.image.src = require("@/assets/image.jpg");
+    this.image.addEventListener("load", () => (this.loaded = true));
 
     this.canvas = this.$refs.landing;
     this.context = this.canvas.getContext("2d");
 
     this.fixSize();
-
-    this.context.beginPath();
-    // this.context.fillStyle = "red";
-    this.context.moveTo(0, 0);
-    this.context.lineTo(window.innerWidth, 0);
-    this.context.lineTo(window.innerWidth, window.innerHeight / 2 + 70);
-    this.context.lineTo(0, window.innerHeight / 2 - 70);
-    // this.context.fill();
-
-    this.context.clip();
-
-    let image = new Image();
-    image.src = require("@/assets/image.jpg");
-    image.addEventListener(
-      "load",
-      function() {
-        self.context.drawImage(
-          image,
-          0,
-          0,
-          window.innerWidth,
-          window.innerHeight
-        );
-      },
-      false
-    );
   },
   methods: {
-    drawTopLayer() {},
+    loop() {
+      if (this.position.y1 <= 0 && this.position.y2 <= 0) {
+        window.cancelAnimationFrame(this.requestId);
+        this.requestId = undefined;
+        console.log("end request");
+      } else {
+        this.drawTopLayer();
+        this.requestId = window.requestAnimationFrame(this.loop);
+        // console.log("start request");
+      }
+    },
+
+    onClick() {
+      console.log("on click");
+      if (this.loaded) {
+        console.log("start request");
+        this.loop();
+
+        // animate value
+        TweenLite.to(this.position, 1.2, {
+          y1: 0,
+          y2: 0,
+          ease: Power3.easeInOut
+        });
+      }
+    },
+
+    drawTopLayer() {
+      console.log(this.position.y1, this.position.y2);
+
+      this.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      this.context.save();
+      this.context.beginPath();
+      this.context.moveTo(0, 0);
+      this.context.lineTo(window.innerWidth, 0);
+      this.context.lineTo(window.innerWidth, this.position.y1);
+      this.context.lineTo(0, this.position.y2);
+      this.context.clip();
+
+      this.drawImage(this.image);
+      this.context.restore();
+    },
     drawBottomLayer() {},
+
+    drawImage(image) {
+      console.log("draw image");
+      this.context.drawImage(
+        image,
+        0,
+        0,
+        window.innerWidth,
+        window.innerHeight
+      );
+    },
+
     fixSize() {
       let dpi = window.devicePixelRatio;
 
