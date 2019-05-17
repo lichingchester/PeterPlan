@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import Landing from "@/layouts/Landing.vue";
+import Landing from "@/components/landing/Landing.vue";
 import Trailer from "@/components/partials/Trailer.vue";
 
 export default {

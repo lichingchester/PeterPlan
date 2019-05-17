@@ -1,5 +1,8 @@
 <template>
-  <canvas class="landing" ref="landing" @click="onClick"></canvas>
+  <div class="canvas-container">
+    <canvas class="landing" ref="landingTop" @click="onClick"></canvas>
+    <canvas class="landing" ref="landingBottom" @click="onClick"></canvas>
+  </div>
 </template>
 
 <script>
@@ -30,13 +33,19 @@ export default {
       }
     }
   },
+  created() {
+    window.addEventListener("resize", this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
+  },
   mounted() {
     // loading assets
     this.image = new Image();
     this.image.src = require("@/assets/image.jpg");
     this.image.addEventListener("load", () => (this.loaded = true));
 
-    this.canvas = this.$refs.landing;
+    this.canvas = this.$refs.landingTop;
     this.context = this.canvas.getContext("2d");
 
     this.fixSize();
@@ -88,7 +97,7 @@ export default {
       this.drawImage(this.image);
 
       // draw text
-      this.context.font = "bold 200px Arial";
+      this.context.font = `bold ${0.1 * window.innerWidth}px Arial`;
       this.context.fillStyle = "red";
       this.context.textAlign = "center";
       this.context.textBaseline = "middle";
@@ -103,12 +112,21 @@ export default {
 
     drawImage(image) {
       console.log("draw image");
+
+      // scale to fill
+      let scale = Math.max(
+        window.innerWidth / this.image.width,
+        window.innerHeight / this.image.height
+      );
+      let x = window.innerWidth / 2 - (this.image.width / 2) * scale;
+      let y = window.innerHeight / 2 - (this.image.height / 2) * scale;
+
       this.context.drawImage(
         image,
-        0,
-        0,
-        window.innerWidth,
-        window.innerHeight
+        x,
+        y,
+        this.image.width * scale,
+        this.image.height * scale
       );
     },
 
@@ -128,6 +146,13 @@ export default {
       this.canvas.setAttribute("width", style_width);
       // this.canvas.setAttribute("height", style_height * dpi);
       // this.canvas.setAttribute("width", style_width * dpi);
+    },
+
+    handleResize() {
+      this.position.y1 = window.innerHeight / 2 + 60;
+      this.position.y2 = window.innerHeight / 2 - 60;
+      this.fixSize();
+      this.drawTopLayer();
     }
   }
 };
