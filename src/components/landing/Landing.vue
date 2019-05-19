@@ -1,46 +1,70 @@
 <template>
   <div class="canvas-container">
-    <canvas class="landing" ref="landingTop" @click="onClick"></canvas>
-    <canvas class="landing" ref="landingBottom" @click="onClick"></canvas>
+    <BottomCanvas
+      ref="bottom"
+      @loaded="onLoaded"
+      :textDistance="textDistance"
+    />
+    <TopCanvas ref="top" @loaded="onLoaded" :textDistance="textDistance" />
   </div>
 </template>
 
 <script>
-import drawTop from "./drawTop";
+import TopCanvas from "./TopCanvas.vue";
+import BottomCanvas from "./BottomCanvas.vue";
 
 export default {
   name: "Landing",
-  mixins: [drawTop],
   data() {
     return {
       requestId: undefined,
+      canLoop: false,
+      textDistance: 6,
 
       // assets
-      images: [],
-      loaded: 0
+      isLoaded: 0
     };
   },
   watch: {
-    loaded(state) {
-      if (state === this.images.length) {
+    isLoaded(state) {
+      if (state === 2) {
         // all images loaded
-        this.drawTopLayer();
+        this.$refs.top.draw();
+        this.$refs.bottom.draw();
       }
     }
   },
   created() {
+    // start animation loop
+    this.canLoop = true;
+
     window.addEventListener("resize", this.handleResize);
   },
   beforeDestroy() {
+    // end animation loop
+    this.canLoop = false;
+
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
-    handleResize() {
-      this.position.y1 = window.innerHeight / 2 + 60;
-      this.position.y2 = window.innerHeight / 2 - 60;
-      this.fixSize();
-      this.drawTopLayer();
+    loop() {
+      if (this.canLoop) {
+        this.drawTopLayer();
+        this.requestId = window.requestAnimationFrame(this.loop);
+      } else {
+        window.cancelAnimationFrame(this.requestId);
+        this.requestId = undefined;
+        console.log("end request");
+      }
+    },
+
+    onLoaded() {
+      this.isLoaded++;
     }
+  },
+  components: {
+    TopCanvas,
+    BottomCanvas
   }
 };
 </script>
